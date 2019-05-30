@@ -1,12 +1,17 @@
 # Meet Andy: ARCore Workshop
 You are going to create a small app that uses ARCore to place Andy the green robot into the real world. You can then take pictures of those scenes and safe them to your storage.
 
+## How to use this repository
+* The final result of every single step of the workshop is available as a commit in the workshop branch
+* If you can't follow along or diverted too much, just `git checkout <COMMIT HASH>` of the commit in the workshop branch
+
 ## Step 0
 * Install Android Studio 3.1 or greater
 * [Enable developer options](https://developer.android.com/studio/debug/dev-options#enable) on your device
 * Install the SceneForm plugin: File -> Settings -> Plugins -> Search for "SceneForm"
 
 ## Step 1.a: Create the project
+`git checkout 5b6ed9c74d5da3e55d62033ac7d8affd6de0a116`
 * File -> New -> New Project
 * Add No Activity
 * Name "Meet Andy"
@@ -36,6 +41,7 @@ adb install -r ARCore_*_x86_for_emulator.apk
 ```
 
 ## Step 2: Configure the project
+`git checkout 4ff7b7d6cef43ccc805c75741619b8e03d027d6a`
 * `AndroidManifest.xml`: Tell Android that your app needs ARCore compatibility to run. Add the following `meta-data` tag inside `application`. If users device does not already have ARCore on device, PlayStore will download it.
 ``` lang=xml
 <application
@@ -70,7 +76,8 @@ dependencies {
 }
 ```
 
-## Step 3.a: Create an ArFragment
+## Step 3.a: Create an `ArFragment`
+`git checkout cb6f572d7e47d267b07edb15e7a82edf1b686ede`
 Ideally you should check if the device you are running on is compatible with the features you need and request necessary permissions during runtime. `ArFragment` does all this for you.
 1. Checks whether a compatible version of ARCore is installed, prompting the user to install or update as necessary
 2. Checks whether the app has access to the camera, and asks the user for permission if it has not yet been granted
@@ -94,6 +101,7 @@ Ideally you should check if the device you are running on is compatible with the
 You should now be able to start the app and walk around until planes are detected.
 
 ## Step 4: Invite Andy to the scene
+`git checkout eb77d0949c55cf5ece9bc01f58f7cb599a418725`
 * Andy comes in the form of a `Renderable`, an abstraction above Meshes, Materials and Textures.
 * In Android Studio, click on the `app` folder and choose New -> Sample Data Directory
 * A good source for renderables is poly.google.com, search for "Andy"
@@ -149,6 +157,7 @@ arFragment.setOnTapArPlaneListener { hitResult, plane, motionEvent ->
 * Run the app and play around
 
 ## Step 5: Save your pictures with Andy
+`git checkout 71f67fed782f016b977e37c241754abf69905d4e`
 * Open `res/activity_main.xml`, we'll add two FloatingActionButtons to change between front and back camera and to take a picture. Replace the whole content of the file with the following:
 ``` lang=xml
 <?xml version="1.0" encoding="utf-8"?>
@@ -338,6 +347,7 @@ class PhotoArFragment : ArFragment() {
 * That's it. Run the app and take photos!
 
 ## Step 6: Get a picture of you and Andy
+`git checkout 8b75206292b99617fdf1575c24a496f0c3e5fa20`
 * Front camera does not work for now due to too low resolution. Face detection and AugmentedFaces does work with front camera.
 * No problem: Add a countdown, then position yourself in the picture
 * Add a TextView to our `activity_main.xml`, inside the `ConstraintLayout` tag
@@ -429,5 +439,5 @@ class MainActivity : AppCompatActivity() {
 ```
 
 ## FINISH
-Congratulations,you just created an app that uses Augmented Reality to create a whole new set of experiences for your users.
+Congratulations, you just created an app that uses Augmented Reality to create a whole new set of experiences for your users.
 
