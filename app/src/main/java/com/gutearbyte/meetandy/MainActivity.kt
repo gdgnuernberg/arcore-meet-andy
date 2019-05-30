@@ -1,26 +1,25 @@
 package com.gutearbyte.meetandy
 
 import android.net.Uri
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.Gravity
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import com.google.ar.sceneform.AnchorNode
 import com.google.ar.sceneform.rendering.ModelRenderable
 import com.google.ar.sceneform.rendering.Renderable
-import com.google.ar.sceneform.ux.ArFragment
 import com.google.ar.sceneform.ux.TransformableNode
 import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity() {
     private lateinit var andyRenderable: Renderable
-    private lateinit var arFragment: ArFragment
+    private lateinit var arFragment: PhotoArFragment
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        arFragment = ux_fragment as ArFragment
+        arFragment = ux_fragment as PhotoArFragment
 
         ModelRenderable.builder()
             .setSource(this, Uri.parse("Andy.sfb"))
@@ -45,6 +44,8 @@ class MainActivity : AppCompatActivity() {
             andy.renderable = andyRenderable
             andy.select()
         }
+
+        fabTakePicture.setOnClickListener { arFragment.takePhoto() }
 
     }
 }
