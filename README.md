@@ -2,15 +2,27 @@
 You are going to create a small app that uses ARCore to place Andy the green robot into the real world. You can then take pictures of those scenes and safe them to your storage.
 
 ## How to use this repository
-* The final result of every single step of the workshop is available as a commit in the workshop branch
-* If you can't follow along or diverted too much, just `git checkout <COMMIT HASH>` of the commit in the workshop branch
+* The outcome of every single step of the workshop is available as a commit in the `workshop` branch of the repository
+* If you can't follow along or diverted too much, just `git checkout <COMMIT HASH>` of the commit. You can then continue with the intended result of each step.
+    * **Step 1: Create the project**
+`git checkout 5b6ed9c74d5da3e55d62033ac7d8affd6de0a116`
+    * **Step 2: Configure the project**
+`git checkout 4ff7b7d6cef43ccc805c75741619b8e03d027d6a`
+    * **Step 3: Create an `ArFragment`**
+`git checkout cb6f572d7e47d267b07edb15e7a82edf1b686ede`
+    * **Step 4: Invite Andy to the scene**
+`git checkout eb77d0949c55cf5ece9bc01f58f7cb599a418725`
+    * **Step 5: Save your pictures with Andy**
+`git checkout 71f67fed782f016b977e37c241754abf69905d4e`
 
-## Step 0
-* Install Android Studio 3.1 or greater
-* [Enable developer options](https://developer.android.com/studio/debug/dev-options#enable) on your device
+## Workshop
+
+### Step 0: Prepare your environment
+* [Download](https://developer.android.com/studio) and install Android Studio 3.1 or greater 
+* [Enable developer options](https://developer.android.com/studio/debug/dev-options#enable) on your Android phone
 * Install the SceneForm plugin: File -> Settings -> Plugins -> Search for "SceneForm"
 
-## Step 1.a: Create the project
+### Step 1.a: Create the project
 `git checkout 5b6ed9c74d5da3e55d62033ac7d8affd6de0a116`
 * File -> New -> New Project
 * Add No Activity
@@ -19,7 +31,7 @@ You are going to create a small app that uses ARCore to place Andy the green rob
 * Minimum API Level for ARCore: 24
 * Use androidx.* artifacts for nicer dependencies
 
-## Step 1.b: Setup SDK and emulator
+### Step 1.b: Setup SDK and emulator
 * Tools -> SDK Manager
 * Install at least Android 7.0 (API level 24), better choose Pie or Q
 * If your device is compatible, you can skip emulator setup, compatible devices: bit.ly/arcore-devices
@@ -40,17 +52,17 @@ You are going to create a small app that uses ARCore to place Andy the green rob
 adb install -r ARCore_*_x86_for_emulator.apk
 ```
 
-## Step 2: Configure the project
+### Step 2: Configure the project
 `git checkout 4ff7b7d6cef43ccc805c75741619b8e03d027d6a`
 * `AndroidManifest.xml`: Tell Android that your app needs ARCore compatibility to run. Add the following `meta-data` tag inside `application`. If users device does not already have ARCore on device, PlayStore will download it.
-``` lang=xml
+``` xml
 <application
     ... >
     <meta-data android:name="com.google.ar.core" android:value="required" />
 </application>
 ```
 * `AndroidManifest.xml`: We also have to request access to some needed features and permissions. Add the following inside the manifest tag.
-``` lang=xml
+``` xml
 <manifest
     ... >
     <uses-permission android:name="android.permission.CAMERA" />
@@ -58,7 +70,7 @@ adb install -r ARCore_*_x86_for_emulator.apk
 </manifest>
 ```
 * Module level `build.gradle`: SceneForm needs Java 8 language features. As we're targeting SDK lvls below 27, so we need to ensure source compatibility. Add this to the `android` section.
-``` lang=groovy
+``` gradle
 android {
     ...
     compileOptions {
@@ -68,7 +80,7 @@ android {
 }
 ```
 * Module level `build.gradle`: Now add the dependencies for SceneForm and ARCore to the `dependencies` section
-``` lang=groovy
+``` gradle
 dependencies {
     …
     implementation 'com.google.ar:core:1.9.0'
@@ -76,7 +88,7 @@ dependencies {
 }
 ```
 
-## Step 3.a: Create an `ArFragment`
+### Step 3.a: Create an `ArFragment`
 `git checkout cb6f572d7e47d267b07edb15e7a82edf1b686ede`
 Ideally you should check if the device you are running on is compatible with the features you need and request necessary permissions during runtime. `ArFragment` does all this for you.
 1. Checks whether a compatible version of ARCore is installed, prompting the user to install or update as necessary
@@ -85,7 +97,7 @@ Ideally you should check if the device you are running on is compatible with the
 * Choose File -> New -> Android Activity -> Empty Activity
 * Call it MainActivity, check "Launcher Activity"
 * Open res/layout/activity_main.xml and replace its content with
-``` lang=xml
+``` xml
 <?xml version="1.0" encoding="utf-8"?>
 <fragment
         xmlns:android="http://schemas.android.com/apk/res/android"
@@ -97,10 +109,10 @@ Ideally you should check if the device you are running on is compatible with the
         android:layout_height="match_parent"/>
 ```
 
-## Step 3.b: Run it!
+### Step 3.b: Run it!
 You should now be able to start the app and walk around until planes are detected.
 
-## Step 4: Invite Andy to the scene
+### Step 4: Invite Andy to the scene
 `git checkout eb77d0949c55cf5ece9bc01f58f7cb599a418725`
 * Andy comes in the form of a `Renderable`, an abstraction above Meshes, Materials and Textures.
 * In Android Studio, click on the `app` folder and choose New -> Sample Data Directory
@@ -109,7 +121,7 @@ You should now be able to start the app and walk around until planes are detecte
 * Extract everything to the models folder you just created (right click on it, then choose "Show in Files" if you can't find it)
 * Back in Android Studio, right click on the OBJ file -> Click "Import SceneForm Asset", accept the defaults
 * Then change your MainActivity to this:
-``` lang=kotlin
+``` kotlin
 class MainActivity : AppCompatActivity() {
     private lateinit var andyRenderable: Renderable
 
@@ -132,15 +144,15 @@ class MainActivity : AppCompatActivity() {
 }
 ```
 * To tell your compiler that the ux_fragment is of type ArFragment add this to the top of `MainActivity`
-``` lang=kotlin
+``` kotlin
 private lateinit var arFragment: ArFragment
 ```
 * Then in `MainActivity.onCreate()` add the initialization:
-``` lang=kotlin
+``` kotlin
 arFragment = ux_fragment as ArFragment
 ```
 * There's more to add: a `TapArPlaneListener` right after the model builder to detect if the user tapped on a plane. If the listener is fired, we add Andy to the scene!
-``` lang=kotlin
+``` kotlin
 arFragment.setOnTapArPlaneListener { hitResult, plane, motionEvent ->
             // Create the Anchor.
             val anchor = hitResult.createAnchor()
@@ -156,10 +168,10 @@ arFragment.setOnTapArPlaneListener { hitResult, plane, motionEvent ->
 ```
 * Run the app and play around
 
-## Step 5: Save your pictures with Andy
+### Step 5: Save your pictures with Andy
 `git checkout 71f67fed782f016b977e37c241754abf69905d4e`
 * Open `res/activity_main.xml`, we'll add two FloatingActionButtons to change between front and back camera and to take a picture. Replace the whole content of the file with the following:
-``` lang=xml
+``` xml
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -189,7 +201,7 @@ arFragment.setOnTapArPlaneListener { hitResult, plane, motionEvent ->
 ```
 
 * Add a dependency to Android Material to your Module level `build.gradle`:
-``` lang=json
+``` gradle
 dependencies {
     implementation 'com.google.android.material:material:1.0.0'
 }
@@ -198,14 +210,14 @@ dependencies {
 * We now need to request permission to write files to external storage
 * Right-Click on your `res` folder, New -> Android Ressource directory -> xml 
 * Inside this folder, create the file `paths.xml` (New -> XML Ressource Fiel) and put this inside:
-``` lang=xml
+``` xml
 <?xml version="1.0" encoding="utf-8"?>
 <paths xmlns:android="http://schemas.android.com/apk/res/android">
    <external-path name="meet-andy" path="Pictures" />
 </paths>
 ```
 * Our manifest `AndroidManifest.xml` needs to know about the path, needs to inform about the needed permission to write to storage and we'll also add an Url provider to safely share URIs with other apps
-``` lang=xml
+``` xml
 <manifest>
 ...
 <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
@@ -226,7 +238,7 @@ dependencies {
 
 * Permissions are actually requested at runtime and until know our ArFragment took care about this. We need to extend it to request more permissions.
 * Create a new Kotlin class file, name it `PhotoArFragment.kt` and put this inside:
-``` lang=kotlin
+``` kotlin
 class PhotoArFragment : ArFragment() {
     override fun getAdditionalPermissions(): Array<String?> {
         val additionalPermissions = super.getAdditionalPermissions()
@@ -244,7 +256,7 @@ class PhotoArFragment : ArFragment() {
 * Right-Click on the class name -> Copy reference
 * Open `res/layout/activity_main.xml` and replace the attribute android:name of the fragment with the reference to `PhotoArFragment`
 * To take photos and open it with the photos app, we need to add a bit of boilerplate code to our `PhotoArFragment`, just replace the class with the following:
-``` lang=kotlin
+``` kotlin
 class PhotoArFragment : ArFragment() {
     override fun getAdditionalPermissions(): Array<String?> {
         val additionalPermissions = super.getAdditionalPermissions()
@@ -346,12 +358,12 @@ class PhotoArFragment : ArFragment() {
 `fabTakePicture.setOnClickListener { arFragment.takePhoto() }`
 * That's it. Run the app and take photos!
 
-## Step 6: Get a picture of you and Andy
+### Step 6: Get a picture of you and Andy
 `git checkout 8b75206292b99617fdf1575c24a496f0c3e5fa20`
 * Front camera does not work for now due to too low resolution. Face detection and AugmentedFaces does work with front camera.
 * No problem: Add a countdown, then position yourself in the picture
 * Add a TextView to our `activity_main.xml`, inside the `ConstraintLayout` tag
-``` lang=xml
+``` xml
 <ConstraintLayout
 ...>
     ...
@@ -372,7 +384,7 @@ class PhotoArFragment : ArFragment() {
 </ConstraintLayout>
 ```
 * Go to `MainActivity` and add the countdown logic. We also want to clean up the scene a bit and remove the plane indicator and selection indicator. Replace `MainActivity` with this:
-``` lang=kotlin
+``` kotlin
 class MainActivity : AppCompatActivity() {
     private lateinit var andyRenderable: Renderable
     private lateinit var arFragment: PhotoArFragment
@@ -438,6 +450,6 @@ class MainActivity : AppCompatActivity() {
 }
 ```
 
-## FINISH
-Congratulations, you just created an app that uses Augmented Reality to create a whole new set of experiences for your users.
+### Congratulations
+You just created an app that uses Augmented Reality to create a whole new set of experiences for your users.
 
