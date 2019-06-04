@@ -87,6 +87,7 @@ dependencies {
     implementation 'com.google.ar.sceneform.ux:sceneform-ux:1.9.0'
 }
 ```
+
 Shortcut to final outcome: `git reset --hard 4ff7b7d6cef43ccc805c75741619b8e03d027d6a`
 
 ### Step 3.a: Create an `ArFragment`
@@ -167,6 +168,7 @@ arFragment.setOnTapArPlaneListener { hitResult, plane, motionEvent ->
         }
 ```
 * Run the app and play around
+
 Shortcut to final outcome: `git reset --hard eb77d0949c55cf5ece9bc01f58f7cb599a418725`
 
 ### Step 5: Save your pictures with Andy
@@ -357,6 +359,7 @@ class PhotoArFragment : ArFragment() {
 * Now we can easily add a click listener to the photo action button in our `MainActivity.kt`. Just add this to the bottom of the `onCreate()` method:
 `fabTakePicture.setOnClickListener { arFragment.takePhoto() }`
 * That's it. Run the app and take photos!
+
 Shortcut to final outcome: `git reset --hard 71f67fed782f016b977e37c241754abf69905d4e`
 
 ### Step 6: Get a picture of you and Andy
@@ -449,6 +452,7 @@ class MainActivity : AppCompatActivity() {
     }
 }
 ```
+
 Shortcut to final outcome: `git reset --hard 8b75206292b99617fdf1575c24a496f0c3e5fa20`
 
 ### Congratulations
