@@ -3,17 +3,17 @@ You are going to create a small app that uses ARCore to place Andy the green rob
 
 ## How to use this repository
 * The outcome of every single step of the workshop is available as a commit in the `workshop` branch of the repository
-* If you can't follow along or diverted too much, just `git checkout <COMMIT HASH>` of the commit. You can then continue with the intended result of each step.
+* If you can't follow along or diverted too much, just `git reset --hard <COMMIT HASH>` of the commit. You can then continue with the intended result of each step.
     * **Step 1: Create the project**
-`git checkout 5b6ed9c74d5da3e55d62033ac7d8affd6de0a116`
+`git reset --hard 5b6ed9c74d5da3e55d62033ac7d8affd6de0a116`
     * **Step 2: Configure the project**
-`git checkout 4ff7b7d6cef43ccc805c75741619b8e03d027d6a`
+`git reset --hard 4ff7b7d6cef43ccc805c75741619b8e03d027d6a`
     * **Step 3: Create an `ArFragment`**
-`git checkout cb6f572d7e47d267b07edb15e7a82edf1b686ede`
+`git reset --hard cb6f572d7e47d267b07edb15e7a82edf1b686ede`
     * **Step 4: Invite Andy to the scene**
-`git checkout eb77d0949c55cf5ece9bc01f58f7cb599a418725`
+`git reset --hard eb77d0949c55cf5ece9bc01f58f7cb599a418725`
     * **Step 5: Save your pictures with Andy**
-`git checkout 71f67fed782f016b977e37c241754abf69905d4e`
+`git reset --hard 71f67fed782f016b977e37c241754abf69905d4e`
 
 ## Workshop
 
@@ -23,28 +23,29 @@ You are going to create a small app that uses ARCore to place Andy the green rob
 * Install the SceneForm plugin: File -> Settings -> Plugins -> Search for "SceneForm"
 
 ### Step 1.a: Create the project
-`git checkout 5b6ed9c74d5da3e55d62033ac7d8affd6de0a116`
-* File -> New -> New Project
+* In Android Studio, go to File -> New -> New Project
 * Add No Activity
-* Name "Meet Andy"
-* Language "Kotlin"
-* Minimum API Level for ARCore: 24
-* Use androidx.* artifacts for nicer dependencies
+* Name the project "Meet Andy"
+* Use language "Kotlin"
+* Minimum API level for ARCore is 24, so choose at least 24
+* Use androidx.* artifacts
+
+Shortcut to final outcome: `git reset --hard 5b6ed9c74d5da3e55d62033ac7d8affd6de0a116`
 
 ### Step 1.b: Setup SDK and emulator
-* Tools -> SDK Manager
+* In Android Studio, go to Tools -> SDK Manager
 * Install at least Android 7.0 (API level 24), better choose Pie or Q
-* If your device is compatible, you can skip emulator setup, compatible devices: bit.ly/arcore-devices
-* If not compatible: Tools -> AVD Manager
+* If your device is compatible, you can skip emulator setup. List of compatible devices: bit.ly/arcore-devices
+* If your device is not compatible: Go to Tools -> AVD Manager
 * Click Create Virtual Device
 * Choose e.g. Pixel 3 device definition
 * Download a system image with at least API level 24
 * We need OpenGL 3.0 or higher and Android Emulator 27 or higher for SceneForm
 * Tools -> SDK Manager -> SDK Tools -> Check Android Emulator Version
-* Start your emulator, then check through adb which Open GL version is used: adb logcat | grep eglMakeCurrent
-* If it's below 3.0, enforce through Extended Controls -> Settings -> Advanced
-* If using emulator: Configure your cameras, back camera Virtual Scene and / or front camera webcam0 (if available)
-* If using emulator: update ARCore
+* Start your emulator, then check through adb which Open GL version is used: `adb logcat | grep eglMakeCurrent`
+* If it's below 3.0, enforce in your Emulator by going to Extended Controls -> Settings -> Advanced
+* If using emulator: Configure your cameras, back camera should be Virtual Scene
+* If using emulator: Update ARCore
 * Go to bit.ly/arcore-apk
 * Download the latest ARCore for emulator APK
 * Sideload it to your emulator with
@@ -53,7 +54,6 @@ adb install -r ARCore_*_x86_for_emulator.apk
 ```
 
 ### Step 2: Configure the project
-`git checkout 4ff7b7d6cef43ccc805c75741619b8e03d027d6a`
 * `AndroidManifest.xml`: Tell Android that your app needs ARCore compatibility to run. Add the following `meta-data` tag inside `application`. If users device does not already have ARCore on device, PlayStore will download it.
 ``` xml
 <application
@@ -61,7 +61,7 @@ adb install -r ARCore_*_x86_for_emulator.apk
     <meta-data android:name="com.google.ar.core" android:value="required" />
 </application>
 ```
-* `AndroidManifest.xml`: We also have to request access to some needed features and permissions. Add the following inside the manifest tag.
+* `AndroidManifest.xml`: We also have to be granted access to some features and permissions. Add the following inside the manifest tag.
 ``` xml
 <manifest
     ... >
@@ -69,7 +69,7 @@ adb install -r ARCore_*_x86_for_emulator.apk
     <uses-feature android:name="android.hardware.camera.ar" />
 </manifest>
 ```
-* Module level `build.gradle`: SceneForm needs Java 8 language features. As we're targeting SDK lvls below 27, so we need to ensure source compatibility. Add this to the `android` section.
+* Module level `build.gradle`: SceneForm needs Java 8 language features. As we're targeting SDK levels below 27 we need to ensure source compatibility. Add this to the `android` section.
 ``` gradle
 android {
     ...
@@ -87,12 +87,12 @@ dependencies {
     implementation 'com.google.ar.sceneform.ux:sceneform-ux:1.9.0'
 }
 ```
+Shortcut to final outcome: `git reset --hard 4ff7b7d6cef43ccc805c75741619b8e03d027d6a`
 
 ### Step 3.a: Create an `ArFragment`
-`git checkout cb6f572d7e47d267b07edb15e7a82edf1b686ede`
 Ideally you should check if the device you are running on is compatible with the features you need and request necessary permissions during runtime. `ArFragment` does all this for you.
-1. Checks whether a compatible version of ARCore is installed, prompting the user to install or update as necessary
-2. Checks whether the app has access to the camera, and asks the user for permission if it has not yet been granted
+1. It checks whether a compatible version of ARCore is installed, prompting the user to install or update as necessary
+2. It checks whether the app has access to the camera, and asks the user for permission if it has not yet been granted
 
 * Choose File -> New -> Android Activity -> Empty Activity
 * Call it MainActivity, check "Launcher Activity"
@@ -108,14 +108,14 @@ Ideally you should check if the device you are running on is compatible with the
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>
 ```
+Shortcut to final outcome: `git reset --hard cb6f572d7e47d267b07edb15e7a82edf1b686ede`
 
 ### Step 3.b: Run it!
 You should now be able to start the app and walk around until planes are detected.
 
 ### Step 4: Invite Andy to the scene
-`git checkout eb77d0949c55cf5ece9bc01f58f7cb599a418725`
 * Andy comes in the form of a `Renderable`, an abstraction above Meshes, Materials and Textures.
-* In Android Studio, click on the `app` folder and choose New -> Sample Data Directory
+* In Android Studio, click on your `app` folder and choose New -> Sample Data Directory
 * A good source for renderables is poly.google.com, search for "Andy"
 * Download the OBJ variant of Andy
 * Extract everything to the models folder you just created (right click on it, then choose "Show in Files" if you can't find it)
@@ -167,10 +167,10 @@ arFragment.setOnTapArPlaneListener { hitResult, plane, motionEvent ->
         }
 ```
 * Run the app and play around
+Shortcut to final outcome: `git reset --hard eb77d0949c55cf5ece9bc01f58f7cb599a418725`
 
 ### Step 5: Save your pictures with Andy
-`git checkout 71f67fed782f016b977e37c241754abf69905d4e`
-* Open `res/activity_main.xml`, we'll add two FloatingActionButtons to change between front and back camera and to take a picture. Replace the whole content of the file with the following:
+* Open `res/activity_main.xml`, we'll add a FloatingActionButton to take a picture. Replace the whole content of the file with the following:
 ``` xml
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
@@ -208,8 +208,8 @@ dependencies {
 ```
 
 * We now need to request permission to write files to external storage
-* Right-Click on your `res` folder, New -> Android Ressource directory -> xml 
-* Inside this folder, create the file `paths.xml` (New -> XML Ressource Fiel) and put this inside:
+* Right-Click on your `res` folder, choose New -> Android Resource directory -> xml 
+* Inside this folder, create the file `paths.xml` (New -> XML Resource Field) and put this inside:
 ``` xml
 <?xml version="1.0" encoding="utf-8"?>
 <paths xmlns:android="http://schemas.android.com/apk/res/android">
@@ -236,7 +236,7 @@ dependencies {
 </manifest>
 ```
 
-* Permissions are actually requested at runtime and until know our ArFragment took care about this. We need to extend it to request more permissions.
+* Permissions are actually requested at runtime and until now our ArFragment took care about this. We need to extend ArFragment to request more permissions.
 * Create a new Kotlin class file, name it `PhotoArFragment.kt` and put this inside:
 ``` kotlin
 class PhotoArFragment : ArFragment() {
@@ -253,7 +253,7 @@ class PhotoArFragment : ArFragment() {
 }
 ```
 
-* Right-Click on the class name -> Copy reference
+* Right-Click on the class name, choose -> Copy reference
 * Open `res/layout/activity_main.xml` and replace the attribute android:name of the fragment with the reference to `PhotoArFragment`
 * To take photos and open it with the photos app, we need to add a bit of boilerplate code to our `PhotoArFragment`, just replace the class with the following:
 ``` kotlin
@@ -357,11 +357,11 @@ class PhotoArFragment : ArFragment() {
 * Now we can easily add a click listener to the photo action button in our `MainActivity.kt`. Just add this to the bottom of the `onCreate()` method:
 `fabTakePicture.setOnClickListener { arFragment.takePhoto() }`
 * That's it. Run the app and take photos!
+Shortcut to final outcome: `git reset --hard 71f67fed782f016b977e37c241754abf69905d4e`
 
 ### Step 6: Get a picture of you and Andy
-`git checkout 8b75206292b99617fdf1575c24a496f0c3e5fa20`
-* Front camera does not work for now due to too low resolution. Face detection and AugmentedFaces does work with front camera.
-* No problem: Add a countdown, then position yourself in the picture
+* Front camera does not work with plane detection and anchors for now. Face detection and AugmentedFaces do work with front camera.
+* But no problem: Add a countdown, then position yourself in the picture
 * Add a TextView to our `activity_main.xml`, inside the `ConstraintLayout` tag
 ``` xml
 <ConstraintLayout
@@ -449,6 +449,7 @@ class MainActivity : AppCompatActivity() {
     }
 }
 ```
+Shortcut to final outcome: `git reset --hard 8b75206292b99617fdf1575c24a496f0c3e5fa20`
 
 ### Congratulations
 You just created an app that uses Augmented Reality to create a whole new set of experiences for your users.
