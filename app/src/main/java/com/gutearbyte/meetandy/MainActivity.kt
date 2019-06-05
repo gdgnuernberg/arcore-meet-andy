@@ -28,7 +28,7 @@ class MainActivity : AppCompatActivity() {
         ModelRenderable.builder()
             .setSource(this, Uri.parse("Andy.sfb"))
             .build()
-            .thenAccept { renderable: Renderable -> this.renderable = renderable }
+            .thenAccept { this.renderable = it }
             .exceptionally {
                 val toast = Toast.makeText(this, "Unable to load renderable", Toast.LENGTH_LONG)
                 toast.setGravity(Gravity.CENTER, 0, 0)

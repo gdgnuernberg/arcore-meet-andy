@@ -70,7 +70,7 @@ class PhotoArFragment : ArFragment() {
         val handlerThread = HandlerThread("PixelCopier")
         handlerThread.start()
         // Make the request to copy.
-        PixelCopy.request(arSceneView, bitmap, { copyResult: Int ->
+        PixelCopy.request(arSceneView, bitmap, { copyResult ->
             if (copyResult == PixelCopy.SUCCESS) {
                 try {
                     saveBitmapToDisk(bitmap, filename)
