@@ -87,7 +87,7 @@ class PhotoArFragment : ArFragment() {
                     view!!,
                     "Photo saved", Snackbar.LENGTH_LONG
                 )
-                snackbar.setAction("Open in Photos") { v ->
+                snackbar.setAction("Open in Photos") {
                     val photoFile = File(filename)
 
                     val photoURI = FileProvider.getUriForFile(
@@ -101,7 +101,7 @@ class PhotoArFragment : ArFragment() {
                     startActivity(intent)
 
                 }
-                snackbar.show()
+                snackbar.setDuration(10000).show()
             } else {
                 val toast = Toast.makeText(
                     activity,

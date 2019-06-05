@@ -48,3 +48,8 @@ sceneform.asset('sampledata/Andy.obj',
         'default',
         'sampledata/Andy.sfa',
         'src/main/assets/Andy')
+
+sceneform.asset('sampledata/danseuse/model.obj',
+        'default',
+        'sampledata/danseuse/model.sfa',
+        'src/main/assets/model')
