@@ -17,7 +17,7 @@ import kotlinx.android.synthetic.main.activity_main.*
 class MainActivity : AppCompatActivity() {
     private lateinit var renderable: Renderable
     private lateinit var arFragment: PhotoArFragment
-    private var selectedAndy: TransformableNode? = null
+    private var node: TransformableNode? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -26,7 +26,7 @@ class MainActivity : AppCompatActivity() {
         arFragment = ux_fragment as PhotoArFragment
 
         ModelRenderable.builder()
-            .setSource(this, Uri.parse("model.sfb"))
+            .setSource(this, Uri.parse("Andy.sfb"))
             .build()
             .thenAccept { renderable: Renderable -> this.renderable = renderable }
             .exceptionally {
@@ -43,11 +43,13 @@ class MainActivity : AppCompatActivity() {
             anchorNode.setParent(arFragment.arSceneView.scene)
 
             // Create the transformable andy and add it to the anchor.
-            val andy = TransformableNode(arFragment.transformationSystem)
-            andy.setParent(anchorNode)
-            andy.renderable = renderable
-            selectedAndy = andy
-            andy.select()
+            val modelNode = TransformableNode(arFragment.transformationSystem)
+            modelNode.setParent(anchorNode)
+            modelNode.renderable = renderable
+            modelNode.scaleController.maxScale = 5.00f;
+            modelNode.scaleController.minScale = 0.01f;
+            node = modelNode
+            modelNode.select()
         }
 
         fabTakePicture.setOnClickListener { takePhotoWithCountdown() }
@@ -74,6 +76,6 @@ class MainActivity : AppCompatActivity() {
         arFragment.arSceneView.planeRenderer.isEnabled = false
         tvCountdown.visibility = View.VISIBLE
         fabTakePicture.hide()
-        selectedAndy?.transformationSystem?.selectNode(null)
+        node?.transformationSystem?.selectNode(null)
     }
 }
