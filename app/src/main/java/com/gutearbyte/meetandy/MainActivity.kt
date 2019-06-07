@@ -1,5 +1,6 @@
 package com.gutearbyte.meetandy
 
+import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.os.CountDownTimer
@@ -7,11 +8,13 @@ import android.view.Gravity
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import com.google.android.material.snackbar.Snackbar
 import com.google.ar.sceneform.AnchorNode
 import com.google.ar.sceneform.rendering.ModelRenderable
 import com.google.ar.sceneform.rendering.Renderable
 import com.google.ar.sceneform.ux.TransformableNode
 import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.coroutines.*
 
 
 class MainActivity : AppCompatActivity() {
@@ -54,26 +57,51 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun takePhotoWithCountdown() {
-        object : CountDownTimer(4000, 1000) {
+        object : CountDownTimer(6000, 1000) {
 
             override fun onTick(millisUntilFinished: Long) {
-                tvCountdown.text = ((millisUntilFinished / 1000) + 1).toString()
+                if (millisUntilFinished < 5000) {
+                    tvCountdown.text = ((millisUntilFinished / 1000) + 1).toString()
+                    tvCountdown.visibility = View.VISIBLE
+
+                } else {
+                    arFragment.arSceneView.planeRenderer.isVisible = false
+                    fabTakePicture.hide()
+                    selectedAndy?.transformationSystem?.selectNode(null)
+                }
             }
 
             override fun onFinish() {
                 tvCountdown.text = "Cheese!"
                 tvCountdown.postDelayed({
-                    tvCountdown.visibility = View.INVISIBLE
-                    fabTakePicture.show()
-                    arFragment.arSceneView.planeRenderer.isEnabled = true
-                }, 1000)
-                arFragment.takePhoto()
+                    tvCountdown.visibility = View.GONE
+                    takePhoto()
+                }, 2000)
             }
         }.start()
-        // Hide all the chrome for a nice photo
-        arFragment.arSceneView.planeRenderer.isEnabled = false
-        tvCountdown.visibility = View.VISIBLE
-        fabTakePicture.hide()
-        selectedAndy?.transformationSystem?.selectNode(null)
+    }
+
+    private fun takePhoto() {
+        arFragment.arSceneView.planeRenderer.isVisible = true
+        progressBar.visibility = View.VISIBLE
+        GlobalScope.launch {
+            try {
+                val photoUri = arFragment.savePhoto()
+                val snackbar = Snackbar.make(
+                    arFragment.view!!,
+                    "Photo saved", Snackbar.LENGTH_LONG
+                )
+                snackbar.setAction("Open in Photos") {
+                    val intent = Intent(Intent.ACTION_VIEW, photoUri)
+                    intent.setDataAndType(photoUri, "image/*")
+                    intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                    startActivity(intent)
+                }
+                snackbar.show()
+            } catch (e: Exception) {
+                Toast.makeText(this@MainActivity, "Failed to save the photo", Toast.LENGTH_LONG).show()
+            }
+            withContext(Dispatchers.Main) { fabTakePicture.show(); progressBar.visibility = View.GONE }
+        }
     }
 }

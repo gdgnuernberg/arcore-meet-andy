@@ -3,6 +3,7 @@ package com.gutearbyte.meetandy
 import android.Manifest
 import android.content.Intent
 import android.graphics.Bitmap
+import android.net.Uri
 import android.os.Environment
 import android.os.Handler
 import android.os.HandlerThread
@@ -11,12 +12,18 @@ import android.widget.Toast
 import androidx.core.content.FileProvider
 import com.google.android.material.snackbar.Snackbar
 import com.google.ar.sceneform.ux.ArFragment
+import kotlinx.coroutines.Deferred
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
 import java.text.SimpleDateFormat
 import java.util.*
+import kotlinx.coroutines.*
+import kotlin.coroutines.Continuation
+import kotlin.coroutines.resume
+import kotlin.coroutines.resumeWithException
+import kotlin.coroutines.suspendCoroutine
 
 class PhotoArFragment : ArFragment() {
     override fun getAdditionalPermissions(): Array<String?> {
@@ -57,7 +64,7 @@ class PhotoArFragment : ArFragment() {
         }
     }
 
-    fun takePhoto() {
+    suspend fun savePhoto() = withContext(Dispatchers.IO) {
         val filename = generateFilename()
 
         // Create a bitmap the size of the scene view.
@@ -70,46 +77,35 @@ class PhotoArFragment : ArFragment() {
         val handlerThread = HandlerThread("PixelCopier")
         handlerThread.start()
         // Make the request to copy.
-        PixelCopy.request(arSceneView, bitmap, { copyResult: Int ->
-            if (copyResult == PixelCopy.SUCCESS) {
-                try {
-                    saveBitmapToDisk(bitmap, filename)
-                } catch (e: IOException) {
-                    val toast = Toast.makeText(
-                        activity, e.toString(),
-                        Toast.LENGTH_LONG
-                    )
-                    toast.show()
-                    return@request
-                }
+        return@withContext suspendCoroutine { cont: Continuation<Uri> ->
+            async {
+                PixelCopy.request(arSceneView, bitmap, { copyResult: Int ->
+                    if (copyResult == PixelCopy.SUCCESS) {
+                        try {
+                            saveBitmapToDisk(bitmap, filename)
+                        } catch (e: IOException) {
+                            val toast = Toast.makeText(
+                                activity, e.toString(),
+                                Toast.LENGTH_LONG
+                            )
+                            toast.show()
+                        }
 
-                val snackbar = Snackbar.make(
-                    view!!,
-                    "Photo saved", Snackbar.LENGTH_LONG
-                )
-                snackbar.setAction("Open in Photos") { v ->
-                    val photoFile = File(filename)
+                        val photoFile = File(filename)
+                        val photoURI = FileProvider.getUriForFile(
+                            activity!!.applicationContext,
+                            activity!!.packageName + ".meetandy.name.provider",
+                            photoFile
+                        )
 
-                    val photoURI = FileProvider.getUriForFile(
-                        activity!!.applicationContext,
-                        activity!!.packageName + ".meetandy.name.provider",
-                        photoFile
-                    )
-                    val intent = Intent(Intent.ACTION_VIEW, photoURI)
-                    intent.setDataAndType(photoURI, "image/*")
-                    intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-                    startActivity(intent)
-
-                }
-                snackbar.show()
-            } else {
-                val toast = Toast.makeText(
-                    activity,
-                    "Failed to copyPixels: $copyResult", Toast.LENGTH_LONG
-                )
-                toast.show()
+                        cont.resume(photoURI)
+                    } else {
+                        // Failed to save photo
+                        cont.resumeWithException(Exception("PixelCopy error code $copyResult"))
+                    }
+                    handlerThread.quitSafely()
+                }, Handler(handlerThread.looper))
             }
-            handlerThread.quitSafely()
-        }, Handler(handlerThread.looper))
+        }
     }
 }
